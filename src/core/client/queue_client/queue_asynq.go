@@ -28,7 +28,7 @@ func NewQueueAsynq(
 	}
 }
 
-func (q *QueueAsynq) ProcessTask(fn ...map[string]func(context.Context, *asynq.Task) error) error {
+func (q *QueueAsynq) ProcessTask(fn ...map[string]asynq.HandlerFunc) error {
 	mux := asynq.NewServeMux()
 
 	for _, maps := range fn {

@@ -1,7 +1,6 @@
 package queue
 
 import (
-	"context"
 	"log"
 
 	"github.com/hibiken/asynq"
@@ -11,11 +10,11 @@ import (
 )
 
 type QueueConsumer struct {
-	queue queueclient.QueueClient
+	queue queueclient.QueueClient[asynq.HandlerFunc]
 }
 
 func NewQueueConsumer(
-	queueClient queueclient.QueueClient,
+	queueClient queueclient.QueueClient[asynq.HandlerFunc],
 ) *QueueConsumer {
 	return &QueueConsumer{
 		queue: queueClient,
@@ -24,7 +23,7 @@ func NewQueueConsumer(
 
 func (q *QueueConsumer) Start() {
 	err := q.queue.ProcessTask(
-		map[string]func(context.Context, *asynq.Task) error{
+		map[string]asynq.HandlerFunc{
 			constant.TaskIssueInvoice: issueinvoice.NewIssueInvoiceHandler().Run,
 		},
 	)

@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/hibiken/asynq"
 	uuid "github.com/satori/go.uuid"
 
 	"github.com/go-co-op/gocron"
@@ -18,11 +19,11 @@ type Job interface {
 }
 
 type JobImpl struct {
-	queue queueclient.QueueClient
+	queue queueclient.QueueClient[asynq.HandlerFunc]
 }
 
 func NewJob(
-	queue queueclient.QueueClient,
+	queue queueclient.QueueClient[asynq.HandlerFunc],
 ) Job {
 	return &JobImpl{
 		queue: queue,
@@ -32,7 +33,7 @@ func NewJob(
 func (job *JobImpl) Start() (err error) {
 	s := gocron.NewScheduler(time.Local)
 
-	_, err = s.Every(5).Second().Do(job.issueInvoices)
+	_, err = s.Every(30).Second().Do(job.issueInvoices)
 	if err != nil {
 		return err
 	}

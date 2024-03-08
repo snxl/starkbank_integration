@@ -2,11 +2,9 @@ package queueclient
 
 import (
 	"context"
-
-	"github.com/hibiken/asynq"
 )
 
-type QueueClient interface {
-	ProcessTask(fn ...map[string]func(context.Context, *asynq.Task) error) error
+type QueueClient[FN any] interface {
+	ProcessTask(fn ...map[string]FN) error
 	IssueInvoiceDeliveryTask(ctx context.Context, obj interface{}) error
 }
