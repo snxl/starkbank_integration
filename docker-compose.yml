@@ -1,0 +1,35 @@
+version: '3.7'
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.30.3
+    container_name: app_prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - monitoring-network
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - '6379:6379'
+    command: /bin/sh -c "redis-server --requirepass $$REDIS_PASSWORD"
+    volumes:
+      - cache:/data
+    container_name: app_redis
+    env_file:
+      - redis.env    
+    networks:
+      - monitoring-network
+
+networks:
+  monitoring-network:
+    driver: bridge   
+volumes:
+  mysql-data:
+  cache:  
+  mongodb_data:    
