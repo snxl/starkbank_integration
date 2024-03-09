@@ -4,13 +4,15 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
+	"github.com/hibiken/asynqmon"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/snxl/stark_bank_integration/src/application/docs"
 	healthcheck "github.com/snxl/stark_bank_integration/src/application/handler/health_check"
-	invoicepaidevent "github.com/snxl/stark_bank_integration/src/application/handler/invoice_paid_event"
+	invoiceevent "github.com/snxl/stark_bank_integration/src/application/handler/invoice_event"
+	"github.com/snxl/stark_bank_integration/src/config"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/swaggo/swag/example/basic/docs"
 )
 
 var (
@@ -56,11 +58,17 @@ func (s *Server) Start(addr string) error {
 	{
 		webhook := v1.Group("/webhook")
 		{
-			webhook.POST("/starkbank", invoicepaidevent.NewInvoicePaidEventHandler().Run)
+			webhook.POST("/starkbank", invoiceevent.NewInvoicePaidEventHandler().Run)
 		}
 	}
 
+	h := asynqmon.New(asynqmon.Options{
+		RootPath:     "/monitor",
+		RedisConnOpt: config.GetAsynq().RedisOpt,
+	})
+
 	prometheus.MustRegister(httpRequestsTotal)
+	r.Any("/monitor/*a", gin.WrapH(h))
 	r.GET("/healthcheck", healthcheck.NewHealthCheckHandler().Run)
 	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

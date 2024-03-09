@@ -1,0 +1,55 @@
+definitions:
+  webhook.Event:
+    properties:
+      log:
+        $ref: '#/definitions/webhook.Log'
+      subscription:
+        type: string
+    type: object
+  webhook.Invoice:
+    properties:
+      amount:
+        type: integer
+      id:
+        type: string
+      status:
+        type: string
+    type: object
+  webhook.Log:
+    properties:
+      invoice:
+        $ref: '#/definitions/webhook.Invoice'
+    type: object
+  webhook.Request:
+    properties:
+      event:
+        $ref: '#/definitions/webhook.Event'
+    type: object
+info:
+  contact: {}
+paths:
+  /webhook/starkbank:
+    post:
+      consumes:
+      - application/json
+      description: Job notification to registry a transfer
+      parameters:
+      - description: body payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/webhook.Request'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Transfer webhook
+      tags:
+      - webhook
+swagger: "2.0"

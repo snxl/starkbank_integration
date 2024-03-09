@@ -2,9 +2,8 @@ package payment
 
 import (
 	"fmt"
-	"os"
-	"time"
 
+	"github.com/snxl/stark_bank_integration/src/config/keys"
 	"github.com/snxl/stark_bank_integration/src/core/dto/payment"
 	"github.com/starkbank/sdk-go/starkbank"
 	"github.com/starkbank/sdk-go/starkbank/invoice"
@@ -14,10 +13,11 @@ import (
 )
 
 func init() {
+	key := keys.GetKeys()
 	starkbank.User = project.Project{
-		Id:          os.Getenv("STARK_BANK_PROJECT_ID"),
-		PrivateKey:  checks.CheckPrivateKey(os.Getenv("STARK_BANK_PRIVATE_KEY")),
-		Environment: checks.CheckEnvironment("sandbox"),
+		Id:          key.ProjectId,
+		PrivateKey:  checks.CheckPrivateKey(key.PrivateKey),
+		Environment: checks.CheckEnvironment(key.Environment),
 	}
 }
 
@@ -45,8 +45,6 @@ func (s *StarkbankSDKClient) IssueInvoice(input payment.IssueInvoiceDTO) error {
 		}
 	}
 
-	fmt.Printf("invoice created to user: %s cpf: %s\n", input.Name, input.Cpf)
-
 	return nil
 }
 
@@ -69,12 +67,6 @@ func (s *StarkbankSDKClient) SendTransfer(input payment.SendTransferDTO) error {
 			return fmt.Errorf("code: %s, message: %s", e.Code, e.Message)
 		}
 	}
-
-	fmt.Printf(
-		"Tranfered %d to Stark Bank at: %v\n",
-		input.Amount,
-		time.Now().Format("2006-01-02 15:04:05"),
-	)
 
 	return nil
 }

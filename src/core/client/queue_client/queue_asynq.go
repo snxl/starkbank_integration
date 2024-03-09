@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/hibiken/asynq"
+	"github.com/snxl/stark_bank_integration/src/core/dto/webhook"
 	"github.com/snxl/stark_bank_integration/src/shared/constant"
 )
 
@@ -47,6 +48,24 @@ func (q *QueueAsynq) IssueInvoiceDeliveryTask(ctx context.Context, obj interface
 	}
 
 	task := asynq.NewTask(constant.TaskIssueInvoice, jsonPayload)
+	info, err := q.client.EnqueueContext(ctx, task)
+	if err != nil {
+		return fmt.Errorf("failed to enqueue task: %w", err)
+	}
+
+	msg := fmt.Sprintf("type %s payload %s queue %s max retry %d", task.Type(), string(task.Payload()), info.Queue, info.MaxRetry)
+	fmt.Println(msg)
+
+	return nil
+}
+
+func (q *QueueAsynq) ProcessInvoiceEvent(ctx context.Context, input webhook.Event) error {
+	jsonPayload, err := json.Marshal(input)
+	if err != nil {
+		return fmt.Errorf("failed to marshal task payload: %w", err)
+	}
+
+	task := asynq.NewTask(constant.TaskProcessInvoiceEvent, jsonPayload)
 	info, err := q.client.EnqueueContext(ctx, task)
 	if err != nil {
 		return fmt.Errorf("failed to enqueue task: %w", err)

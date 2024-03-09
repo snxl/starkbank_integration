@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math/rand"
 	"time"
 
 	"github.com/hibiken/asynq"
@@ -33,7 +34,7 @@ func NewJob(
 func (job *JobImpl) Start() (err error) {
 	s := gocron.NewScheduler(time.Local)
 
-	_, err = s.Every(30).Second().Do(job.issueInvoices)
+	_, err = s.Every(3).Hour().Do(job.issueInvoices)
 	if err != nil {
 		return err
 	}
@@ -44,10 +45,10 @@ func (job *JobImpl) Start() (err error) {
 }
 
 func (job *JobImpl) issueInvoices() {
-	// max, min := 12, 8
-	// randomInvoices := rand.Intn(max-min+1) + min
+	max, min := 12, 8
+	randomInvoices := rand.Intn(max-min+1) + min
 
-	for i := 1; i <= 1; i++ {
+	for i := 1; i <= randomInvoices; i++ {
 		err := job.queue.IssueInvoiceDeliveryTask(
 			context.Background(),
 			uuid.NewV4(),

@@ -1,0 +1,88 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/webhook/starkbank": {
+            "post": {
+                "description": "Job notification to registry a transfer",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "webhook"
+                ],
+                "summary": "Transfer webhook",
+                "parameters": [
+                    {
+                        "description": "body payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/webhook.Request"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "webhook.Event": {
+            "type": "object",
+            "properties": {
+                "log": {
+                    "$ref": "#/definitions/webhook.Log"
+                },
+                "subscription": {
+                    "type": "string"
+                }
+            }
+        },
+        "webhook.Invoice": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "webhook.Log": {
+            "type": "object",
+            "properties": {
+                "invoice": {
+                    "$ref": "#/definitions/webhook.Invoice"
+                }
+            }
+        },
+        "webhook.Request": {
+            "type": "object",
+            "properties": {
+                "event": {
+                    "$ref": "#/definitions/webhook.Event"
+                }
+            }
+        }
+    }
+}

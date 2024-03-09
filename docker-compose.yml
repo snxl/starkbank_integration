@@ -26,10 +26,17 @@ services:
     networks:
       - monitoring-network
 
+  app:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    volumes:
+      - .:/go/src/application
+    networks:
+      - monitoring-network
+
 networks:
   monitoring-network:
     driver: bridge   
 volumes:
-  mysql-data:
   cache:  
-  mongodb_data:    
