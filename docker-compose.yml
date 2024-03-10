@@ -17,12 +17,10 @@ services:
     image: "redis:alpine"
     ports:
       - '6379:6379'
-    command: /bin/sh -c "redis-server --requirepass $$REDIS_PASSWORD"
+    command: /bin/sh -c "redis-server --requirepass 123456"
     volumes:
       - cache:/data
-    container_name: app_redis
-    env_file:
-      - redis.env    
+    container_name: app_redis  
     networks:
       - monitoring-network
 
@@ -30,8 +28,10 @@ services:
     build:
       dockerfile: Dockerfile
       context: .
-    volumes:
-      - .:/go/src/application
+    # volumes:
+    #   - .:/go/src/application
+    ports:
+      - "8080:8080"
     networks:
       - monitoring-network
 

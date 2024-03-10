@@ -19,7 +19,7 @@ func main() {
 		panic(err)
 	}
 
-	err = server.NewServer().Start("8081")
+	err = server.NewServer().Start("8080")
 	if err != nil {
 		panic(err)
 	}
